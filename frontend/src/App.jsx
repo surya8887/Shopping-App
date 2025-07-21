@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 // Lazy load pages
 const Home = lazy(() => import('./pages/Home'));
@@ -29,7 +30,9 @@ function App() {
           <Route path="/placeorder" element={<PlaceOrder />} />
           <Route path="/order" element={<Order />} />
         </Routes>
+
       </Suspense>
+      <Footer/>
     </div>
   );
 }
