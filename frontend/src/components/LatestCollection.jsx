@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
 import Title from "./Title";
 import { ProductItem } from "./ProductItem";
+import RelatedProduct from "./RelatedProduct";
 
 const LatestCollection = () => {
     const { products } = useContext(ShopContext);
@@ -34,6 +35,9 @@ const LatestCollection = () => {
                     />
                 ))}
             </div>
+
+            {/*  related produect */}
+            <RelatedProduct/>
         </div>
     );
 };

@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
 
 export const ProductItem = ({ id, image, name, price }) => {
     const { currency } = useContext(ShopContext);
 
     return (
-        <Link to={`product/${id}`} className="group block text-gray-600">
+        <NavLink to={`/product/${id}`} className="group block text-gray-600">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
                 <div className="overflow-hidden rounded-t-xl">
                     <img
@@ -28,6 +28,6 @@ export const ProductItem = ({ id, image, name, price }) => {
                 </div>
 
             </div>
-        </Link>
+        </NavLink>
     );
 };
