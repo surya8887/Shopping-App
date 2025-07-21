@@ -3,7 +3,7 @@ import { assets } from '../assets/frontend_assets/assets';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 text-gray-700 py-14 px-6 mt-5 font-sans">
+    <footer className=" text-gray-500 py-14 px-6 mt-5 font-sans">
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-14 text-base tracking-wide">
         
         {/* Logo & About */}
