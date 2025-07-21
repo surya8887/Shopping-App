@@ -1,6 +1,7 @@
 import { assets } from "../assets/frontend_assets/assets";
 import { NavLink, Link } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { ShopContext } from "../context/ShopContext";
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
@@ -12,6 +13,10 @@ const Navbar = () => {
     { name: "Contact", to: "/contact" },
   ];
 
+
+
+  const [visibleSearch, setvisibleSearch] = useState(false);
+  const {setShowSearch} = useContext(ShopContext)
   return (
     <nav className="flex items-center justify-between py-5 px-4 font-medium relative shadow-sm bg-white">
       {/* Logo */}
@@ -49,7 +54,7 @@ const Navbar = () => {
 
       {/* Right Icons */}
       <div className="flex items-center gap-5">
-        <img src={assets.search_icon} alt="Search" className="w-5 cursor-pointer" />
+        <img onClick={()=>setShowSearch(true)} src={assets.search_icon} alt="Search" className="w-5 cursor-pointer" />
 
         {/* Cart */}
         <Link to="/cart" className="relative w-6 h-6">

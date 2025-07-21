@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import SearchBar from './components/SearchBar';
 
 // Lazy load pages
 const Home = lazy(() => import('./pages/Home'));
@@ -18,6 +19,7 @@ function App() {
   return (
     <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[7vw]">
       <Navbar />
+      <SearchBar/>
       <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
         <Routes>
           <Route path="/" element={<Home />} />
