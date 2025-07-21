@@ -1,63 +1,70 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/frontend_assets/assets";
 import Title from '../components/Title';
 import { ProductItem } from '../components/ProductItem';
 
 const Collection = () => {
-  const { products } = useContext(ShopContext);
+  const { products, search, showSearch, setSearch } = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(false);
-  const [filter, setFilter] = useState([]);
   const [category, setCategory] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
-  const [sortOption, setSortOption] = useState("relavent");
+  const [sortOption, setSortOption] = useState("relevant");
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
 
+  // Debounce the search input to improve performance
   useEffect(() => {
-    setFilter(products);
-  }, [products]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300); // delay in ms
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Filtered and sorted product list (memoized)
+  const filteredProducts = useMemo(() => {
+    let filtered = [...products];
+
+    // Apply search filter
+    if (showSearch && debouncedSearch) {
+      filtered = filtered.filter(item =>
+        item.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+      );
+    }
+
+    // Apply category filter
+    if (category.length > 0) {
+      filtered = filtered.filter(item => category.includes(item.category));
+    }
+
+    // Apply subcategory filter
+    if (subCategory.length > 0) {
+      filtered = filtered.filter(item => subCategory.includes(item.subCategory));
+    }
+
+    // Sorting
+    if (sortOption === "high-low") {
+      filtered.sort((a, b) => b.price - a.price);
+    } else if (sortOption === "low-high") {
+      filtered.sort((a, b) => a.price - b.price);
+    }
+
+    return filtered;
+  }, [products, debouncedSearch, showSearch, category, subCategory, sortOption]);
 
   const toggleCategory = (e) => {
     const value = e.target.value;
-    if (category.includes(value)) {
-      setCategory((prev) => prev.filter(item => item !== value));
-    } else {
-      setCategory((prev) => [...prev, value]);
-    }
+    setCategory(prev =>
+      prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]
+    );
   };
 
   const toggleSubCategory = (e) => {
     const value = e.target.value;
-    if (subCategory.includes(value)) {
-      setSubCategory((prev) => prev.filter(item => item !== value));
-    } else {
-      setSubCategory((prev) => [...prev, value]);
-    }
+    setSubCategory(prev =>
+      prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]
+    );
   };
-
-  const applyFilter = () => {
-    let filteredProducts = [...products];
-
-    if (category.length > 0) {
-      filteredProducts = filteredProducts.filter(item => category.includes(item.category));
-    }
-
-    if (subCategory.length > 0) {
-      filteredProducts = filteredProducts.filter(item => subCategory.includes(item.subCategory));
-    }
-
-    // Apply sorting
-    if (sortOption === "high-low") {
-      filteredProducts.sort((a, b) => b.price - a.price);
-    } else if (sortOption === "low-high") {
-      filteredProducts.sort((a, b) => a.price - b.price);
-    }
-
-    setFilter(filteredProducts);
-  };
-
-  useEffect(() => {
-    applyFilter();
-  }, [category, subCategory, sortOption]);
 
   return (
     <div className="flex flex-col sm:flex-row gap-6 pt-10 border-t px-4 max-w-9xl mx-auto">
@@ -85,6 +92,7 @@ const Collection = () => {
                   <input
                     type="checkbox"
                     value={item}
+                    checked={category.includes(item)}
                     className="accent-orange-500"
                     onChange={toggleCategory}
                   />
@@ -94,7 +102,7 @@ const Collection = () => {
             </div>
           </div>
 
-          {/* Types Filter */}
+          {/* Sub-Category Filter */}
           <div className="border border-gray-300 p-4 rounded-md shadow-sm bg-white">
             <p className="mb-3 font-semibold text-sm text-gray-600">Types</p>
             <div className="flex flex-col gap-2 text-sm text-gray-700">
@@ -103,6 +111,7 @@ const Collection = () => {
                   <input
                     type="checkbox"
                     value={type}
+                    checked={subCategory.includes(type)}
                     className="w-4 h-4 accent-orange-500"
                     onChange={toggleSubCategory}
                   />
@@ -111,6 +120,19 @@ const Collection = () => {
               ))}
             </div>
           </div>
+
+          {/* Clear Filters Button */}
+          <button
+            onClick={() => {
+              setCategory([]);
+              setSubCategory([]);
+              setSearch('');
+              setSortOption('relevant');
+            }}
+            className="text-sm text-orange-500 underline mt-2"
+          >
+            Clear All Filters
+          </button>
         </div>
       </div>
 
@@ -121,9 +143,10 @@ const Collection = () => {
           <Title text1="All" text2="Collections" />
           <select
             className="border border-gray-300 rounded px-2 py-1 text-sm"
+            value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}
           >
-            <option value="relavent">Sort by: Relevant</option>
+            <option value="relevant">Sort by: Relevant</option>
             <option value="high-low">Sort by: High to Low</option>
             <option value="low-high">Sort by: Low to High</option>
           </select>
@@ -131,15 +154,19 @@ const Collection = () => {
 
         {/* Product Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {filter.map((item, index) => (
-            <ProductItem
-              key={index}
-              id={item._id}
-              name={item.name}
-              price={item.price}
-              image={item.image}
-            />
-          ))}
+          {filteredProducts.length === 0 ? (
+            <p className="col-span-full text-center text-gray-500">No products found.</p>
+          ) : (
+            filteredProducts.map((item, index) => (
+              <ProductItem
+                key={index}
+                id={item._id}
+                name={item.name}
+                price={item.price}
+                image={item.image}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>
