@@ -15,8 +15,9 @@ const Navbar = () => {
   return (
     <nav className="flex items-center justify-between py-5 px-4 font-medium relative shadow-sm bg-white">
       {/* Logo */}
-      <img src={assets.logo} alt="Logo" className="h-10" />
-
+      <Link to={'/'}><img src={assets.logo} alt="Logo" className="h-10" />
+</Link>
+      
       {/* Desktop Navigation */}
       <ul className="hidden sm:flex gap-8 text-gray-700 text-sm">
         {navLinks.map(({ name, to }) => (
