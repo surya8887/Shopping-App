@@ -9,14 +9,14 @@ const Footer = () => {
         {/* Logo & About */}
         <div>
           <img src={assets.logo} className="mb-5 w-36" alt="Logo" />
-          <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+          <p className="text-gray-600 lg:text-xl leading-relaxed  sm:text-base">
             Elevate your shopping experience with our handpicked collections. Quality, trust, and satisfaction – all in one place.
           </p>
         </div>
 
         {/* Navigation Links */}
         <div>
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Quick Links</h3>
+          <h3 className="lg:text-4xl font-semibold mb-4 text-gray-800">Quick Links</h3>
           <ul className="flex flex-col gap-2 text-gray-600 text-base">
             <li className="hover:text-orange-500 transition">Home</li>
             <li className="hover:text-orange-500 transition">About</li>
@@ -38,7 +38,7 @@ const Footer = () => {
 
       {/* Footer Bottom */}
       <div className="mt-12 border-t pt-6 text-center text-sm text-gray-400">
-        © {new Date().getFullYear()} <span className="font-medium text-gray-600">YourBrand</span>. All rights reserved.
+        © {new Date().getFullYear()} <span className="font-medium text-gray-600">forever</span>. All rights reserved.
       </div>
     </footer>
   );

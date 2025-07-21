@@ -13,7 +13,7 @@ function BestSeller() {
   }, [products]);
 
   return (
-    <div className='my-10'>
+    <div className='my-10 px-4 sm:px-6 md:px-10 '>
       <div className="text-center py-8">
         <Title text1={"Best"} text2={"Sellers"} />
         <p className="font-poppins max-w-7xl mx-auto text-center text-gray-700 text-lg sm:text-xl lg:text-2xl font-medium leading-relaxed px-3 sm:px-6">

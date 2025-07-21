@@ -12,11 +12,11 @@ const LatestCollection = () => {
     }, [products]);
 
     return (
-        <div className="my-10 px-4 sm:px-6 md:px-10 lg:px-[5vw]">
+        <div className="my-10 px-4 sm:px-6 md:px-10 ">
             {/* Section Header */}
             <div className="text-center mb-8">
                 <Title text1="Latest" text2="Collection" />
-                <p className="max-w-7xl mx-auto text-center text-gray-600 text-base sm:text-lg md:text-xl font-light leading-relaxed px-2 sm:px-4">
+                <p className="max-w-9xl mx-auto text-center text-gray-600 text-base sm:text-lg md:text-xl font-light leading-relaxed px-2 sm:px-4">
                     Discover our most recent arrivals. From trending fashion to timeless classics, find the perfect product that fits your style and budget.
                 </p>
 
