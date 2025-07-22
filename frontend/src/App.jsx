@@ -3,6 +3,8 @@ import { Suspense, lazy } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import SearchBar from './components/SearchBar';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Lazy load pages
 const Home = lazy(() => import('./pages/Home'));
@@ -17,9 +19,22 @@ const PlaceOrder = lazy(() => import('./pages/PlaceOrder'));
 
 function App() {
   return (
-    <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[7vw]">
+    <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[7vw]">{/* Toast container should be outside of main layout elements */}
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+
       <Navbar />
-      <SearchBar/>
+      <SearchBar />
+
       <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -32,9 +47,11 @@ function App() {
           <Route path="/placeorder" element={<PlaceOrder />} />
           <Route path="/order" element={<Order />} />
         </Routes>
-
       </Suspense>
-      <Footer/>
+
+      <Footer />
+
+      
     </div>
   );
 }

@@ -16,7 +16,7 @@ const Navbar = () => {
 
 
   const [visibleSearch, setvisibleSearch] = useState(false);
-  const {setShowSearch} = useContext(ShopContext)
+  const {setShowSearch,getCartCount} = useContext(ShopContext)
   return (
     <nav className="flex items-center justify-between py-5 px-4 font-medium relative shadow-sm bg-white">
       {/* Logo */}
@@ -60,7 +60,9 @@ const Navbar = () => {
         <Link to="/cart" className="relative w-6 h-6">
           <img src={assets.cart_icon} alt="Cart" className="w-full h-full" />
           <span className="absolute -right-1 -bottom-1 w-5 h-5 bg-black text-white text-[10px] rounded-full flex items-center justify-center">
-            10
+            {
+              getCartCount()
+            }
           </span>
         </Link>
 
