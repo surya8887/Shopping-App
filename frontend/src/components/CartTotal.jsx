@@ -3,7 +3,7 @@ import { ShopContext } from '../context/ShopContext';
 import Title from './Title';
 
 const CartTotal = () => {
-  const { currency, getCartAmount, delivery_fee } = useContext(ShopContext);
+  const { currency, getCartAmount,navigate, delivery_fee } = useContext(ShopContext);
 
   const subtotal = getCartAmount?.() || 0;
   const tax = Math.round(subtotal * 0.1); // assuming 10% tax
@@ -37,12 +37,7 @@ const CartTotal = () => {
         </div>
 
         {/* ✅ Checkout Button */}
-        <button
-          className="mt-6 bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition w-full text-center text-sm sm:text-base font-medium"
-          onClick={() => alert("Checkout functionality coming soon!")}
-        >
-          Proceed to Checkout
-        </button>
+     
       </div>
     </div>
   );

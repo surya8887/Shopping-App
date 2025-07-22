@@ -1,16 +1,18 @@
 import { createContext, useState, useEffect, useCallback } from "react";
 import { products } from "../assets/frontend_assets/assets";
 import { toast } from "react-toastify";
+import {useNavigate} from 'react-router-dom';
+
 
 export const ShopContext = createContext({});
 
 const ShopContextProvider = ({ children }) => {
   const currency = "₹";
   const delivery_fee = 30;
-
   const [search, setSearch] = useState('');
   const [showSearch, setShowSearch] = useState(true);
   const [cartItems, setCartItems] = useState({});
+  const navigate = useNavigate();
 
   // ✅ Add to cart
   const addToCart = useCallback((itemId, size) => {
@@ -104,6 +106,7 @@ const ShopContextProvider = ({ children }) => {
     getCartCount,
     updateQuantity,
     getCartAmount,
+    navigate
   };
 
   return (
