@@ -5,14 +5,13 @@ import { assets } from '../assets/frontend_assets/assets';
 import CartTotal from '../components/CartTotal';
 
 const Cart = () => {
-  const { products, currency, cartItems, updateQuantity, } = useContext(ShopContext);
+  const { products, currency, cartItems, updateQuantity } = useContext(ShopContext);
   const [cartData, setCartData] = useState([]);
 
   useEffect(() => {
     if (!cartItems || typeof cartItems !== 'object') return;
 
     const tempData = [];
-
     for (const productId in cartItems) {
       const sizes = cartItems[productId];
       if (!sizes || typeof sizes !== 'object') continue;
@@ -45,7 +44,7 @@ const Cart = () => {
             return (
               <div
                 key={`${item._id}-${item.size}`}
-                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border rounded-lg shadow-sm"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border rounded-lg shadow-sm bg-white"
               >
                 {/* Image + Info */}
                 <div className="flex flex-col sm:flex-row gap-4 w-full">
@@ -62,10 +61,7 @@ const Cart = () => {
                       {productData.name}
                     </h3>
                     <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-600">
-                      <span>
-                        <strong>Price:</strong> {currency}
-                        {productData.price}
-                      </span>
+                      <span><strong>Price:</strong> {currency}{productData.price}</span>
                       <span className="px-3 py-1 border rounded bg-slate-100">
                         Size: {item.size}
                       </span>
@@ -80,11 +76,16 @@ const Cart = () => {
                       Qty:
                     </label>
                     <input
-                      onChange={(e) => (e.target.value === '' || e.target.validity === '0' ? null : updateQuantity(item._id, item.size, Number(e.target.value)))}
                       id={`qty-${item._id}-${item.size}`}
                       type="number"
                       min={1}
                       defaultValue={item.quantity}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
+                        if (!isNaN(value) && value >= 1) {
+                          updateQuantity(item._id, item.size, value);
+                        }
+                      }}
                       className="w-16 border px-2 py-1 text-center rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                   </div>
@@ -97,10 +98,8 @@ const Cart = () => {
                     <img
                       src={assets.bin_icon}
                       alt="Remove"
-                      className="w-6 sm:w-5 md:w-5 lg:w-8 xl:w-10 cursor-pointer"
-                      title="Remove item"
+                      className="w-6 sm:w-5 md:w-6 lg:w-7 xl:w-8 cursor-pointer"
                     />
-
                   </button>
                 </div>
               </div>
@@ -108,14 +107,15 @@ const Cart = () => {
           })}
         </div>
       )}
-      <div className=" flex
-       justify-end my-10 ">
-        <div className="w-full sm:w-[450px]">
 
-          <CartTotal />
+      {/* Total Section */}
+      {cartData.length > 0 && (
+        <div className="flex justify-end my-10">
+          <div className="w-full sm:w-[450px]">
+            <CartTotal />
+          </div>
         </div>
-
-      </div>
+      )}
     </div>
   );
 };
