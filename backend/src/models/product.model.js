@@ -1,4 +1,4 @@
-import { Schema, model, models } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const productSchema = new Schema(
   {
@@ -17,7 +17,7 @@ const productSchema = new Schema(
       required: true,
     },
     image: {
-      type: [String], // Use type: [String] for clarity
+      type: [String], 
       required: true,
     },
     category: {
@@ -34,17 +34,16 @@ const productSchema = new Schema(
     },
     bestseller: {
       type: Boolean,
-      required: true,
     },
     date: {
       type: Date,
-      required: true,
+
     },
   },
   { timestamps: true }
 );
 
 // Prevent model overwrite error in development
-const Product = models.Product || model("Product", productSchema);
+const Product = mongoose.models.Product || mongoose.model("Product", productSchema);
 
 export default Product;

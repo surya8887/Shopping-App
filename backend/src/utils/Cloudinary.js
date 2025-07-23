@@ -1,5 +1,10 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import dotenv from 'dotenv';
+dotenv.config({
+  path: './.env',
+  // override: true, // 👈 this line forces dotenv to override existing env vars
+});
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
