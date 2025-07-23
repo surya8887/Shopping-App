@@ -4,81 +4,60 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import errorMiddleware from "./middlewares/error.middleware.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
-// --------------------------------------
-// 🔐 Security Middleware
-// --------------------------------------
-app.use(helmet()); // Sets secure HTTP headers
+// Security Middleware
+app.use(helmet());
+
 app.use(
   cors({
-    origin: "*", // TODO: In production, use a whitelist like ["https://yourdomain.com"]
+    origin: "http://localhost:8000", // Replace with your frontend origin
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
-// --------------------------------------
-// 🧾 Logging
-// --------------------------------------
-app.use(morgan("dev")); // Logs HTTP requests
-// --------------------------------------
-// 📦 Body Parsing
-// --------------------------------------
-app.use(express.json()); // Parse JSON request bodies
+
+// Logging
+app.use(morgan("dev"));
+
+// Body Parsing
+app.use(express.json());
 app.use(
   express.urlencoded({
     extended: true,
-    limit: "10mb", // Increase if you expect large form submissions
+    limit: "10mb",
   })
 );
-// --------------------------------------
-// 📂 Static Files
-// --------------------------------------
-app.use(express.static("public")); // Serve static assets from /public
-// --------------------------------------
-// 🚫 Rate Limiting
-// --------------------------------------
+
+// Cookie Parser
+app.use(cookieParser());
+
+// Static Files
+app.use(express.static("public"));
+
+// Rate Limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   standardHeaders: true,
   legacyHeaders: false,
 });
 app.use(limiter);
 
-// --------------------------------------
-// 📌 Routes
+// Routes
+import userRouter from "./routes/user.route.js";
+import productRouter from "./routes/product.route.js";
 
-// --------------------------------------
 app.get("/", (req, res) => {
   res.send("Hello World from Express!");
 });
 
-//  --------------------------------------
-//  🚀 Api Endpoints
-import userRouter from "./routes/user.route.js";
-import productRouter from "./routes/product.route.js";
-app.use('/api/v1/users', userRouter); // http://localhost:8000/api/v1/users/
+app.use("/api/v1/users", userRouter);
 app.use("/api/v1/products", productRouter);
-// --------------------------------------
-// ❌ 404 Handler
-// --------------------------------------
 
-
+// Error Middleware
 app.use(errorMiddleware);
 
-
-/*
-app.use((req, res, next) => {
-  res.status(404).json({ message: "Route not found" });
-});
-
-// --------------------------------------
-// ❗ Error Handler
-// --------------------------------------
-app.use((err, req, res, next) => {
-  console.error("Unexpected error:", err);
-  res.status(500).json({ message: "Internal Server Error" });
-});
-*/
 export default app;
