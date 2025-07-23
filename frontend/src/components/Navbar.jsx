@@ -16,13 +16,13 @@ const Navbar = () => {
 
 
   const [visibleSearch, setvisibleSearch] = useState(false);
-  const {setShowSearch,getCartCount} = useContext(ShopContext)
+  const { setShowSearch, getCartCount } = useContext(ShopContext)
   return (
     <nav className="flex items-center justify-between py-5 px-4 font-medium relative shadow-sm bg-white">
       {/* Logo */}
       <Link to={'/'}><img src={assets.logo} alt="Logo" className="h-10" />
-</Link>
-      
+      </Link>
+
       {/* Desktop Navigation */}
       <ul className="hidden sm:flex gap-8 text-gray-700 text-sm">
         {navLinks.map(({ name, to }) => (
@@ -54,7 +54,7 @@ const Navbar = () => {
 
       {/* Right Icons */}
       <div className="flex items-center gap-5">
-        <img onClick={()=>setShowSearch(true)} src={assets.search_icon} alt="Search" className="w-5 cursor-pointer" />
+        <img onClick={() => setShowSearch(true)} src={assets.search_icon} alt="Search" className="w-5 cursor-pointer" />
 
         {/* Cart */}
         <Link to="/cart" className="relative w-6 h-6">
@@ -68,11 +68,12 @@ const Navbar = () => {
 
         {/* Profile */}
         <div className="group relative">
-          <img src={assets.profile_icon} alt="Profile" className="w-5 cursor-pointer" />
+          <Link to={'/login'}>
+            <img src={assets.profile_icon} alt="Profile" className="w-5 cursor-pointer" /></Link>
           <div className="hidden group-hover:block absolute right-0 pt-4 z-50">
             <div className="w-36 py-3 px-5 bg-slate-100 shadow-lg rounded-lg flex flex-col gap-2">
               <p className="cursor-pointer hover:text-black">My Profile</p>
-              <p className="cursor-pointer hover:text-black">Orders</p>
+              <Link to={'/order'}><p className="cursor-pointer hover:text-black">Orders</p></Link>
               <p className="cursor-pointer hover:text-black">Logout</p>
             </div>
           </div>

@@ -49,7 +49,7 @@ const Product = () => {
         {/* Main Image */}
         <div className="flex-1">
           <img
-            className="w-full h-[300px] md:h-[400px] object-cover rounded-lg shadow-md"
+            className="w-full h-[500px] md:h-[600px] object-cover rounded-lg shadow-md"
             src={selectedImage}
             alt="Selected Product"
           />
