@@ -5,12 +5,13 @@ import {
   listProduct,
   removeProduct,
   singleProduct,
-} from "../controllers/product.controller.js"; // Fixed incorrect file extension
+} from "../controllers/product.controller.js";
 
 const router = Router();
 
-// Route: /add-product
-router.route("/add").post(
+// Route: POST /products/add
+router.post(
+  "/add",
   upload.fields([
     { name: "image1", maxCount: 1 },
     { name: "image2", maxCount: 1 },
@@ -20,13 +21,13 @@ router.route("/add").post(
   addProduct
 );
 
-// Route: /remove-product
-router.route("/remove").put(removeProduct);
+// Route: DELETE /products/remove/:id
+router.delete("/remove/:id", removeProduct);
 
-// Route: /list-products
-router.route("/list").get(listProduct);
+// Route: GET /products/list
+router.get("/list", listProduct);
 
-// Route: /single-product
-router.route("/single").post(singleProduct);
+// Route: GET /products/single/:id
+router.get("/single/:id", singleProduct);
 
 export default router;
