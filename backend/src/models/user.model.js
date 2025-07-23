@@ -1,7 +1,7 @@
 import mongoose, { Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+import validator from "validator";
 
 const userSchema = new Schema(
   {
@@ -18,12 +18,17 @@ const userSchema = new Schema(
       trim: true,
       unique: true,
       lowercase: true,
+      validate: {
+        validator: validator.isEmail,
+        message: "Please provide a valid email address",
+      },
     },
     password: {
       type: String,
       required: true,
       trim: true,
       minLength: 6,
+      select: false,
     },
     cartData: {
       type: Schema.Types.ObjectId,
@@ -32,9 +37,12 @@ const userSchema = new Schema(
     },
     refreshToken: {
       type: String,
+      default: null,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 // 🔐 Hash password before saving
@@ -51,20 +59,16 @@ userSchema.methods.verifyPassword = async function (password) {
 
 // 🔑 Generate access token
 userSchema.methods.generateAccessToken = function () {
-  return jwt.sign(
-    { _id: this._id },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "1h" }
-  );
+  return jwt.sign({ _id: this._id }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "1h",
+  });
 };
 
 // 🔁 Generate refresh token
 userSchema.methods.generateRefreshToken = function () {
-  return jwt.sign(
-    { _id: this._id },
-    process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "1d" }
-  );
+  return jwt.sign({ _id: this._id }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: "1d",
+  });
 };
 
 // 🧼 Remove sensitive fields from JSON

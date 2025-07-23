@@ -2,8 +2,6 @@ import User from "../models/user.model.js";
 import ApiResponse from "../utils/apiResponse.js";
 import ApiError from "../utils/apiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
-import jwt from "jsonwebtoken";
-
 // 🔒 Generate Tokens
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -38,6 +36,7 @@ const setTokenCookies = (res, accessToken, refreshToken) => {
 // 📝 Sign Up
 const SignUp = asyncHandler(async (req, res, next) => {
   const { name, email, password } = req.body;
+
 
   if (!name || !email || !password)
     return next(new ApiError(400, "All fields required"));
