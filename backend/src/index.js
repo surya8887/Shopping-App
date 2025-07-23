@@ -1,5 +1,9 @@
 import dotenv from 'dotenv';
-dotenv.config({ path: './.env' });
+dotenv.config({
+  path: './.env',
+  override: true, // 👈 this line forces dotenv to override existing env vars
+});
+
 
 import DBConnect from './db/db.js';
 import app from './app.js';
