@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { upload } from "../middlewares/multer.middleware.js";
+import { verifyjwt, onlyAdmin } from "../middlewares/auth.middleware.js";
 import {
   addProduct,
   listProduct,
@@ -18,11 +19,13 @@ router.post(
     { name: "image3", maxCount: 1 },
     { name: "image4", maxCount: 1 },
   ]),
+  verifyjwt,
+  onlyAdmin,
   addProduct
 );
 
 // Route: DELETE /products/remove/:id
-router.delete("/remove/:id", removeProduct);
+router.delete("/remove/:id", verifyjwt, onlyAdmin, removeProduct);
 
 // Route: GET /products/list
 router.get("/list", listProduct);

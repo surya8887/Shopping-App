@@ -30,4 +30,15 @@ const verifyjwt = asyncHandler(async (req, res, next) => {
   next();
 });
 
+
+export const onlyAdmin = asyncHandler(async (req, res, next) => {
+  const user = req.user;
+
+  if (!user || user.role !== "admin") {
+    return next(new ApiError(403, "Access denied. Admins only."));
+  }
+
+  next();
+});
+
 export { verifyjwt };

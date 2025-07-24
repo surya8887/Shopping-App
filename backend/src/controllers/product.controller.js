@@ -1,54 +1,73 @@
-import User from "../models/user.model.js";
+import Product from "../models/product.model.js";
 import ApiResponse from "../utils/apiResponse.js";
 import ApiError from "../utils/apiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
-import Product from "../models/product.model.js";
 import uploadOnCloudinary from "../utils/Cloudinary.js";
+import mongoose from "mongoose";
+// 🔼 Utility: Extract image files
+const extractImages = (files) => {
+  return ["image1", "image2", "image3", "image4"]
+    .map((key) => files?.[key]?.[0])
+    .filter(Boolean);
+};
 
-const addProduct = asyncHandler(async (req, res, next) => {
-  const { name, price, description, category, subCategory, sizes, bestseller } = req.body;
+// ➕ Add New Product
+export const addProduct = asyncHandler(async (req, res, next) => {
+  const {
+    name,
+    price,
+    description,
+    category,
+    subCategory,
+    sizes,
+    bestseller,
+  } = req.body;
 
-  // Validate required fields
-  const requiredFields = [name, price, description, category, subCategory, sizes];
-  if (requiredFields.some((field) => !field || field.toString().trim() === "")) {
-    return next(new ApiError(400, "Please fill in all required fields"));
+  // Validate input fields
+  if (
+    !name ||
+    !price ||
+    !description ||
+    !category ||
+    !subCategory ||
+    !sizes ||
+    typeof bestseller === "undefined"
+  ) {
+    return next(new ApiError(400, "All required fields must be provided"));
   }
-  if (typeof bestseller === "undefined") {
-    return next(new ApiError(400, "Bestseller field is required"));
-  }
 
-  // Parse sizes
+  // Parse sizes array safely
   let parsedSizes;
   try {
     parsedSizes = JSON.parse(sizes);
-  } catch (err) {
+    if (!Array.isArray(parsedSizes) || parsedSizes.length === 0) {
+      throw new Error("Sizes must be a non-empty array");
+    }
+  } catch (error) {
     return next(new ApiError(400, "Invalid sizes format"));
   }
 
   // Handle image uploads
-  const image1 = req?.files?.image1?.[0];
-  const image2 = req?.files?.image2?.[0];
-  const image3 = req?.files?.image3?.[0];
-  const image4 = req?.files?.image4?.[0];
-  const images = [image1, image2, image3, image4].filter(Boolean);
-
+  const images = extractImages(req.files);
   if (images.length === 0) {
     return next(new ApiError(400, "At least one image is required"));
   }
 
-  const imageUrls = [];
-
+  let imageUrls = [];
   try {
-    for (const image of images) {
-      const result = await uploadOnCloudinary(image.path);
-      if (!result?.secure_url) throw new Error("Upload failed");
-      imageUrls.push(result.secure_url);
-    }
-  } catch (error) {
-    return next(new ApiError(500, "Image upload failed"));
+    imageUrls = await Promise.all(
+      images.map(async (image) => {
+        const result = await uploadOnCloudinary(image.path);
+        if (!result?.secure_url) throw new Error("Upload failed");
+        return result.secure_url;
+      })
+    );
+  } catch {
+    return next(new ApiError(500, "Failed to upload images"));
   }
 
-  const productDetails = {
+  // Create product document
+  const product = await Product.create({
     name,
     price: Number(price),
     description,
@@ -56,59 +75,78 @@ const addProduct = asyncHandler(async (req, res, next) => {
     category,
     subCategory,
     sizes: parsedSizes,
-    bestseller: bestseller === "true",
+    bestseller: bestseller === "true" || bestseller === true,
     date: new Date(),
-  };
+  });
 
-  const product = await Product.create(productDetails);
-
-  return res
-    .status(200)
-    .json(new ApiResponse(200, product, "Product created successfully"));
+  return res.status(201).json(
+    new ApiResponse(201, {
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category,
+      bestseller: product.bestseller,
+    }, "Product created successfully")
+  );
 });
 
-const listProduct = asyncHandler(async (req, res, next) => {
-  const products = await Product.find().populate("name price description image category ");
+// 📃 Get All Products
+export const listProduct = asyncHandler(async (req, res) => {
+  const products = await Product.find({}, "_id name price image category bestseller");
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, products, "Products listed successfully"));
+  return res.status(200).json(
+    new ApiResponse(200, products, "Products fetched successfully")
+  );
 });
 
-const removeProduct = asyncHandler(async (req, res, next) => {
-  const productId = req.params.id;
+// 🔍 Get Single Product by ID
+export const singleProduct = asyncHandler(async (req, res, next) => {
+  const id= req.params.id?.trim();
 
-  if (!productId) {
+  if (!id) return next(new ApiError(400, "Product ID is required"));
+
+  const product = await Product.findById(id).populate("category subCategory");
+  if (!product) return next(new ApiError(404, "Product not found"));
+
+  return res.status(200).json(
+    new ApiResponse(200, {
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      description: product.description,
+      image: product.image,
+      category: product.category,
+      subCategory: product.subCategory,
+      sizes: product.sizes,
+      bestseller: product.bestseller,
+    }, "Product details fetched")
+  );
+});
+
+// ❌ Delete Product by ID
+export const removeProduct = asyncHandler(async (req, res, next) => {
+  const rawId = req.params.id?.trim();
+
+  if (!rawId) {
     return next(new ApiError(400, "Product ID is required"));
   }
 
-  const product = await Product.findByIdAndDelete(productId);
+  if (!mongoose.Types.ObjectId.isValid(rawId)) {
+    return next(new ApiError(400, "Invalid Product ID format"));
+  }
+
+  const product = await Product.findByIdAndDelete(rawId);
 
   if (!product) {
     return next(new ApiError(404, "Product not found"));
   }
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, product, "Product removed successfully"));
+  return res.status(200).json(
+    new ApiResponse(200, {
+      _id: product._id,
+      name: product.name,
+      deletedAt: new Date().toISOString(),
+    }, "Product deleted successfully")
+  );
 });
-
-const singleProduct = asyncHandler(async (req, res, next) => {
-  const productId = req.params.id;
-
-  if (!productId) {
-    return next(new ApiError(400, "Product ID is required"));
-  }
-
-  const product = await Product.findById(productId).populate("category subCategory");
-
-  if (!product) {
-    return next(new ApiError(404, "Product not found"));
-  }
-
-  return res
-    .status(200)
-    .json(new ApiResponse(200, product, "Product found successfully"));
-});
-
-export { addProduct, listProduct, removeProduct, singleProduct };
