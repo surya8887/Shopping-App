@@ -28,7 +28,6 @@ const userSchema = new Schema(
       required: true,
       trim: true,
       minLength: 6,
-      select: false,
     },
     cartData: {
       type: Schema.Types.ObjectId,
@@ -40,38 +39,42 @@ const userSchema = new Schema(
       default: null,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-// 🔐 Hash password before saving
+// 🔐 Hash password
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-// 🔍 Verify password
+// ✅ Compare password
 userSchema.methods.verifyPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-// 🔑 Generate access token
+// ✅ Generate Access Token
 userSchema.methods.generateAccessToken = function () {
+  if (!process.env.ACCESS_TOKEN_SECRET) {
+    throw new Error("ACCESS_TOKEN_SECRET not set in env");
+  }
   return jwt.sign({ _id: this._id }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "1h",
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1h",
   });
 };
 
-// 🔁 Generate refresh token
+// ✅ Generate Refresh Token
 userSchema.methods.generateRefreshToken = function () {
+  if (!process.env.REFRESH_TOKEN_SECRET) {
+    throw new Error("REFRESH_TOKEN_SECRET not set in env");
+  }
   return jwt.sign({ _id: this._id }, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "1d",
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRY || "7d",
   });
 };
 
-// 🧼 Remove sensitive fields from JSON
+// Remove sensitive fields
 userSchema.set("toJSON", {
   transform: function (doc, ret) {
     delete ret.password;
