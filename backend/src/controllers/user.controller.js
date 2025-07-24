@@ -25,7 +25,7 @@ const SignUp = asyncHandler(async (req, res, next) => {
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(newUser._id);
   setTokenCookies(res, accessToken, refreshToken);
 
-  const userData = await User.findById(newUser._id).select("name email");
+  const userData = await User.findById(newUser._id).select("name email role");
 
   return res
     .status(201)
@@ -53,7 +53,7 @@ const Login = asyncHandler(async (req, res, next) => {
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
   setTokenCookies(res, accessToken, refreshToken);
 
-  const userData = await User.findById(user._id).select("name email");
+  const userData = await User.findById(user._id).select("name email role");
 
   return res
     .status(200)
